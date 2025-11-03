@@ -1,0 +1,82 @@
+scan_filter:
+  ros__parameters:
+    input_scan_topic: "/scan"
+    output_scan_topic: "/perception/scan_filtered"
+    fov_deg: 240.0
+    decim: 2
+    median_win: 5
+    deadzone_r: 0.15
+    safety_bubble_bins: 3
+    range_max_clip: 30.0
+
+
+gap_detector:
+  ros__parameters:
+    scan_topic: "/perception/scan_filtered"
+    gap_theta_topic: "/perception/gap_center"
+    marker_topic: "/perception/gap_marker"
+    gap_threshold: 1.8
+    min_gap_bins: 5
+
+
+lookahead_planner:
+  ros__parameters:
+    gap_theta_topic: "/perception/gap_center"
+    target_angle_topic: "/planning/target_angle"
+    lookahead_topic: "/planning/lookahead"
+    speed_feedback_topic: "/control/speed_raw"
+    L_min: 0.6
+    kL: 0.3
+    alpha_v_est: 0.2
+
+
+curvature_controller:
+  ros__parameters:
+    target_angle_topic: "/planning/target_angle"
+    lookahead_topic: "/planning/lookahead"
+    curvature_topic: "/control/curvature"
+    omega_raw_topic: "/control/omega_raw"
+    v_ref_topic: "/control/speed_raw"
+    omega_max: 2.5
+    alpha_omega: 0.2
+    domega_max: 2.0
+    control_rate_hz: 60.0
+
+
+speed_manager:
+  ros__parameters:
+    scan_topic: "/perception/scan_filtered"
+    curvature_topic: "/control/curvature"
+    speed_topic: "/control/speed_raw"
+    v_max: 3.0
+    c_kappa: 0.9
+    ttc_threshold: 0.8
+    dv_max: 0.5
+    rate_hz: 60.0
+
+
+safety_monitor:
+  ros__parameters:
+    scan_topic: "/perception/scan_filtered"
+    omega_raw_topic: "/control/omega_raw"
+    speed_raw_topic: "/control/speed_raw"
+    cmd_vel_topic: "/control/cmd_vel_safe"
+    r_stop: 0.25
+    watchdog_ms: 150
+    alpha_final: 0.2
+    rate_hz: 60.0
+
+
+cmd_mux:
+  ros__parameters:
+    autonomous_topic: "/control/cmd_vel_safe"
+    teleop_topic: "/teleop/cmd_vel"
+    output_topic: "/cmd_vel"
+    priority: "autonomous"
+
+
+viz:
+  ros__parameters:
+    target_angle_topic: "/planning/target_angle"
+    lookahead_topic: "/planning/lookahead"
+    marker_topic: "/viz/lookahead_marker"
